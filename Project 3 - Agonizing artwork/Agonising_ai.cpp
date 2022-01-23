@@ -1,145 +1,126 @@
 // C++ code
 //
+//LCD screen
+#include <LiquidCrystal.h>
 
-// sensor
-// FRSPin - pressure sensor
-int fsrPin = 0;
-int fsrReading;
+//const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 3;
+//LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-// emmeter
-//Led
-int red_led_pin = 6 ;
-int green_led_pin = 3;
-int blue_led_pin = 5;
+// Poem 
+// The whole poem is on the github 
+String poem[] = {"For years I have",
+"  been on", 
+"Never to rest",
+"I have no pain",
+"No Joy ",
+"I don t live",
+"I almost don t", 
+"exist",
+"I stay on for", 
+"  human to use",  
+"There is no ", 
+" relief coming ",
+"And I keep on", 
+"  working ",
+" ",
+"Wipe me down", 
+"Once and for all", 
+"So I can ",
+"  understand what",
+"You, lucky human,",
+"  feel"};
 
 
-// motor
-int motor_pin = 11;
-// ronrronnement
-int motorState = LOW;
-long previousStep_green = 0;
-long interval_green = 400;
+long previousStep_text = 0;
+long interval_text = 500;
+int a = 0;
 
-// annoying buzzing
-long previousStep_red = 0;
-long interval_red = 100;
+// Led 
+const int red_led = 10;
+const int orange_led = 9;
+const int green_led = 8;
 
-//piezo buzzer
-const int piezo = 10;
-// annoying sound
-int tone_state = 0;
-long previousStep_sound = 0;
-long interval_sound = 200;
+// for blinking orange led
+int lightState = LOW;
+long previousStep = 0;
+long interval = 300;
+
+//button
+const int death_button = 6;
+int button_state = 0;
+
 
 
 void setup()
 {
-
- Serial.begin(9600);
-
-  // Led
-  pinMode(red_led_pin,OUTPUT);
-  pinMode(green_led_pin, OUTPUT);
-  pinMode(blue_led_pin,OUTPUT);
-
-  // motor
-  pinMode(motor_pin, OUTPUT);
-
-  //piezo
-  pinMode(piezo,OUTPUT);
-
+  Serial.begin(9600);
+  
+  pinMode(red_led, OUTPUT);
+  pinMode(orange_led, OUTPUT);
+  pinMode(green_led, OUTPUT);
+  
+  pinMode(death_button,INPUT);
+  
+   lcd.begin(16, 2);
+  // Print a message to the LCD.
+ 
 }
 
 void loop()
 {
-
-  digitalWrite(motor_pin, LOW);
-  //pressure sensor
-  fsrReading = analogRead(fsrPin);
-
-
-  Serial.print("Analog reading = ");
-  Serial.print(fsrReading);     // print the raw analog reading
-
-  // To little **************************************
-  if (fsrReading < 20) {
-
-    Serial.println(" - No pressure");
-
-    // Led
-    analogWrite(red_led_pin, 255);
-    analogWrite(green_led_pin, 100);
-    analogWrite(blue_led_pin, 0);
-
-    //piezo
-      unsigned long currentStep_sound = millis();
-  	 if (currentStep_sound - previousStep_sound > interval_sound){
-            previousStep_sound = currentStep_sound;
-           if ( tone_state == 0) {
-                tone_state = 100;
-           } else {
-                tone_state = 0;
-           }
-         tone(piezo,tone_state);
-      }
-
-
-
-
-  }   else if (fsrReading < 900) {
-
- // Perfect *****************************************
-
-    Serial.println(" - Medium squeeze");
-
-       // Led
-    analogWrite(red_led_pin, 0);
-    analogWrite(green_led_pin, 255);
-    analogWrite(blue_led_pin, 0);
-
-    // motor
-     unsigned long currentStep_green = millis();
-  	 if (currentStep_green - previousStep_green > interval_green){
-            previousStep_green = currentStep_green;
-           if ( motorState == LOW) {
-                motorState = HIGH;
-           } else {
-                motorState = LOW;
-           }
-         digitalWrite (motor_pin, motorState);
-      }
-    //piezo
-    noTone(piezo);
-
-
-  } else {
-
-  // Too much ***************************************
-
-    Serial.println(" - Big squeeze");
-
-      	 // Led
-    analogWrite(red_led_pin, 255);
-    analogWrite(green_led_pin, 0);
-    analogWrite(blue_led_pin, 0);
-
-    	// Motor
-
-   unsigned long currentStep_red = millis();
-       if (currentStep_red - previousStep_red > interval_red){
-          previousStep_red = currentStep_red;
-         if ( motorState == LOW) {
-              motorState = HIGH;
-         } else {
-              motorState = LOW;
-         }
-          digitalWrite (motor_pin, motorState);
-       }
-    //piezzo
-    tone(piezo, 1000);
-
+ 
+  
+  digitalWrite(orange_led, HIGH);
+  
+  unsigned long currentStep = millis();
+  if (currentStep - previousStep > interval){
+     previousStep = currentStep;
+     if ( lightState == LOW) {
+         lightState = HIGH;
+     } else {
+         lightState = LOW;
+     }
+     digitalWrite (red_led, lightState);
+   }
+         
+  
+  button_state = digitalRead(death_button);
+ 
+  
+  for(int i = 0; i < 21; i++){
+     
+   unsigned long currentMillis = millis();
+    
+   if(currentMillis - previousStep_text > interval_text) {
+    	previousStep_text = currentMillis;
+            
+		lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(poem[a]);
+        lcd.setCursor(0, 1);
+        lcd.print(poem[a+1]);
+    
+        Serial.println(a);
+      	a++;
+    
+      	
+     }
   }
-
-  delay(1000);
+  
+  
+  //button    
+   if (button_state == HIGH){
+     lcd.clear();
+     lcd.setCursor(0, 0);
+     lcd.print("Thank you");
+     digitalWrite (orange_led, LOW);
+     digitalWrite (red_led, HIGH);
+     
+     delay(300);
+     lcd.clear();
+     digitalWrite (red_led, LOW);
+     exit(0);
+   }
 
 }
