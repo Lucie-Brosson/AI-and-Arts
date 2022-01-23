@@ -1,4 +1,4 @@
-In this folder you will be able to find more detailed files about the project.
+In this folder you will be able to find more detailed files about the Agonizing AI.
 
 You will be able to find :
 - The complete poem of the project 
