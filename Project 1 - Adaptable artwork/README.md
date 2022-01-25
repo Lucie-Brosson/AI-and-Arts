@@ -1,5 +1,7 @@
-# Adaptable artwork
+In this folder you will be able to find more detailed files about the Sensible ball project.
 
-The adaptable artwork is an exercise on museum and the place of the artwork in it.
+You will be able to find :
+- picture of the project
 
-I want to create an artwork that adapt itself to the viewer.
+Other links that are important : 
+[link the p5js sketch](https://editor.p5js.org/luciemayabrosson/sketches/q4skEEsHP)
